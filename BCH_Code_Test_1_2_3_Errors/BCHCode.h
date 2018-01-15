@@ -1,5 +1,9 @@
 #ifndef BCHCode_h
 #define BCHCode_h
+#ifndef _CLOCK_T_DEFINED
+typedef long clock_t;
+#define _CLOCK_T_DEFINED
+#endif
 
 #include <iostream>
 #include <stdio.h>

@@ -237,7 +237,7 @@ void BCHCode::testOneorTwoError() {
             }
             if(testSecDeOutput[i] == testSecOutput[i]) {
                 cout << "\tUsing the outer XOREncode_"<< i <<" success and the sequence after repair is:\t" << testSecDeOutput[i] <<endl;
-                testSecDeInput[i] = testSecOutput[i]; //要记得这个条纹修复后，测试的时候，记得把DeInput给替换过来，不然会出现问题
+                testSecDeInput[i] = testSecDeOutput[i]; //要记得这个条纹修复后，测试的时候，记得把DeInput给替换过来，不然会出现问题
             } else {
                 cout << "\tThere are more than two errors occurred in more than two sequences, repair failed.\t" << endl;
             }
@@ -290,6 +290,7 @@ void BCHCode::testBCH() {
     cout << "\tXOR result is : \t";
     cout << testXOR << endl;
 
+    clock_t start, finish;
     bool isEnd = 0;
     int errNum = 0;
     while(!isEnd) {
@@ -297,7 +298,7 @@ void BCHCode::testBCH() {
             break;
         }
         testSecDeInput = testSecOutput;
-        double second1 = time((time_t*)NULL);
+        start = clock();
         //4个条纹里生成1位错误
         cout << "$4:\ttest1: gengerate one error:\t" << endl;
         for(int n = 0; n < stripesize; n++) {
@@ -308,41 +309,45 @@ void BCHCode::testBCH() {
                 cout << testSecDeInput[n] << endl;
                 testOneorTwoError();
             }
-        }
-
+        } //1.37s
+        finish = clock();
+        cout << "\tFunction 1 execution time is " << (double)(finish-start) / CLOCKS_PER_SEC << " s" << endl;
+        start = clock();
         //每个条纹里生成2位错误
-//        cout << "$5:\ttest2: gengerate two errors:\t" << endl;
-//        for(int n = 0; n < stripesize; n++) {
-//            for (int errLoc1 = 0; errLoc1 < codeLen - 1; errLoc1 ++) {
-//                for (int errLoc2 = errLoc1 + 1; errLoc2 < codeLen; errLoc2 ++) {
-//                    testSecDeInput[n].flip(errLoc1);
-//                    testSecDeInput[n].flip(errLoc2);
-//                    cout << "\tThe sequence_" << n << " after insert errors " << "at " << errLoc1 << "," << errLoc2 <<" is:\t";
-//                    cout << testSecDeInput[n] << endl;
-//                    //testSecDeInput[n] = testSecOutput[n];
-//                    testOneorTwoError();
-//                }
-//            }
-//        }
+        cout << "$5:\ttest2: gengerate two errors:\t" << endl;
+        for(int n = 0; n < stripesize; n++) {
+            for (int errLoc1 = 0; errLoc1 < codeLen - 1; errLoc1 ++) {
+                for (int errLoc2 = errLoc1 + 1; errLoc2 < codeLen; errLoc2 ++) {
+                    testSecDeInput[n].flip(errLoc1);
+                    testSecDeInput[n].flip(errLoc2);
+                    cout << "\tThe sequence_" << n << " after insert errors " << "at " << errLoc1 << "," << errLoc2 <<" is:\t";
+                    cout << testSecDeInput[n] << endl;
+                    testOneorTwoError();
+                }
+            }
+        }  //146.934s
+        finish = clock();
+        cout << "\tFunction 2 execution time is " << (double)(finish-start) / CLOCKS_PER_SEC << " s" << endl;
+        start = clock();
         //每个条纹里生成3位错误
-//        cout << "$6:\ttest3: gengerate three errors:\t" << endl;
-//        for(int n = 0; n < stripesize; n++) {
-//            for (int errLoc1 = 0; errLoc1 < codeLen - 2; errLoc1 ++) {
-//                for (int errLoc2 = errLoc1 + 1; errLoc2 < codeLen - 1; errLoc2 ++) {
-//                    for(int errLoc3 = errLoc2 + 1; errLoc3 < codeLen; errLoc3 ++){
-//                        testSecDeInput[n].flip(errLoc1);
-//                        testSecDeInput[n].flip(errLoc2);
-//                        testSecDeInput[n].flip(errLoc3);
-//                        cout << "\tThe sequence_" << n << " after insert errors " << "at " << errLoc1 << "," << errLoc2 << "," << errLoc3<<" is:\t";
-//                        cout << testSecDeInput[n] << endl;
-//                        testSecDeInput[n] = testSecOutput[n];
-//                        testOneorTwoError();
-//                    }
-//                }
-//            }
-//        }
-        double second2 = time((time_t*)NULL);
-        cout << "\tFunction execution time is " << second2 - second1 << " s" << endl;
+        cout << "$6:\ttest3: gengerate three errors:\t" << endl;
+        for(int n = 0; n < stripesize; n++) {
+            for (int errLoc1 = 0; errLoc1 < codeLen - 2; errLoc1 ++) {
+                for (int errLoc2 = errLoc1 + 1; errLoc2 < codeLen - 1; errLoc2 ++) {
+                    for(int errLoc3 = errLoc2 + 1; errLoc3 < codeLen; errLoc3 ++){
+                        testSecDeInput[n].flip(errLoc1);
+                        testSecDeInput[n].flip(errLoc2);
+                        testSecDeInput[n].flip(errLoc3);
+                        cout << "\tThe sequence_" << n << " after insert errors " << "at " << errLoc1 << "," << errLoc2 << "," << errLoc3<<" is:\t";
+                        cout << testSecDeInput[n] << endl;
+                        //testSecDeInput[n] = testSecOutput[n];
+                        testOneorTwoError();
+                    }
+                }
+            }
+        }//服务器里跑了5.02S?
+        finish = clock();
+        cout << "\tFunction 3 execution time is " << (double)(finish-start) / CLOCKS_PER_SEC << " s" << endl;
         cout << "\tExit the test? yes : 1 , no : 0\t";
         cin >> isEnd;
     }
