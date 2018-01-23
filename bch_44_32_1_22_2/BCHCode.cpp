@@ -19,105 +19,14 @@ bitset<codeLen> testXOR("00000000000000000000000000000000000000000000");
 bitset<codeLen> testXORDeInput("00000000000000000000000000000000000000000000");
 bitset<codeLen> testXORDeOutput("00000000000000000000000000000000000000000000");
 
-//vector<long long> errTable(4096, -1);
 unordered_map<bitset<parityLen>, bitset<codeLen>> errTable;
 
-unsigned long number_strip = 50000000; //设置的几组数据 1GB数据 大概是1GB的数据量
+unsigned long number_strip = 50000; //设置的几组数据 1GB数据 大概是1GB的数据量
 int flag[4] = {0};
 
 struct  timeval  start_time;
 struct  timeval  end_time;
 unsigned long Time_consuming_Read = 0, Time_consuming_Write = 0;
-
-void fun_GenerateParity(bitset<dataLen> & input, bitset<codeLen> & output)
-{
-    //进行赋值操作
-    for(int i = 0; i < dataLen; i++){
-        output[i + 12] = input[i];
-    }
-    output[11] = input[31] ^ input[28] ^ input[27] ^ input[26] ^ input[25] ^ input[22] ^ input[21] ^ input[19] ^ input[15] ^ input[14] ^ input[10] ^ input[9] ^ input[7] ^ input[6] ^ input[5] ^ input[4] ^ input[3] ^ input[2];
-    output[10] = input[30] ^ input[27] ^ input[26] ^ input[25] ^ input[24] ^ input[21] ^ input[20] ^ input[18]  ^ input[14] ^ input[13] ^ input[9] ^ input[8] ^ input[6] ^ input[5] ^ input[4] ^ input[3] ^ input[2] ^ input[1];
-    output[9] = input[31] ^ input[29] ^ input[28]  ^ input[27] ^ input[24] ^ input[23] ^ input[22] ^ input[21] ^ input[20] ^ input[17] ^ input[15] ^ input[14] ^ input[13]  ^ input[12] ^ input[10] ^ input[9] ^ input[8] ^ input[6]  ^ input[1] ^ input[0];
-    output[8] = input[30] ^ input[28] ^ input[27] ^ input[26] ^ input[23] ^ input[22] ^ input[21] ^ input[20] ^ input[19] ^ input[16] ^ input[14] ^ input[13] ^ input[12] ^ input[11]  ^ input[9] ^ input[8] ^ input[7] ^ input[5] ^ input[0];
-    output[7] = input[31] ^ input[29] ^ input[28] ^ input[20] ^ input[18] ^ input[14] ^ input[13] ^ input[12] ^ input[11] ^ input[9] ^ input[8] ^ input[5] ^ input[3] ^ input[2];
-    output[6] = input[30] ^ input[28] ^ input[27] ^ input[19] ^ input[17] ^ input[13]^ input[12] ^ input[11] ^ input[10] ^ input[8] ^ input[7] ^ input[4] ^ input[2] ^ input[1];
-    output[5] = input[29] ^ input[27] ^ input[26] ^ input[18] ^ input[16] ^ input[12] ^ input[11] ^ input[10] ^ input[9] ^ input[7] ^ input[6] ^ input[3] ^ input[1] ^ input[0];
-    output[4] = input[31] ^ input[27]  ^ input[22] ^ input[21] ^ input[19] ^ input[17] ^ input[14] ^ input[11] ^ input[8] ^ input[7] ^ input[4] ^ input[3] ^ input[0];
-    output[3] = input[31] ^ input[30] ^ input[28] ^ input[27] ^ input[25] ^ input[22] ^ input[20] ^ input[19] ^ input[18] ^ input[16] ^ input[15] ^ input[14] ^ input[13] ^ input[9] ^ input[5] ^ input[4];
-    output[2] = input[31] ^ input[30] ^ input[29] ^ input[28] ^ input[25] ^ input[24] ^ input[22] ^ input[18] ^ input[17] ^ input[13] ^ input[12] ^ input[10] ^ input[9] ^ input[8] ^ input[7] ^ input[6] ^ input[5] ^ input[2];
-    output[1] = input[30] ^ input[29] ^ input[28] ^ input[27] ^ input[24] ^ input[23] ^ input[21] ^ input[17] ^ input[16] ^ input[12] ^ input[11] ^ input[9] ^ input[8] ^ input[7] ^ input[6] ^ input[5] ^ input[4] ^ input[1];
-    output[0] = input[29] ^ input[28] ^ input[27] ^ input[26] ^ input[23] ^ input[22] ^ input[20] ^ input[16] ^ input[15] ^ input[11] ^ input[10] ^ input[8] ^ input[7] ^ input[6] ^ input[5] ^ input[4] ^ input[3] ^ input[0];
-}
-
-void fun_Adjoint(bitset<codeLen> & input, bitset<parityLen> & output)
-{
-    output[0] = input[43] ^ input[40] ^ input[39] ^ input[38] ^ input[37] ^ input[34] ^ input[33] ^ input[31] ^ input[27] ^ input[26] ^ input[22] ^ input[21] ^ input[19] ^ input[18] ^ input[17] ^ input[16] ^input[15] ^ input[14] ^ input[11];
-	output[1] = input[42] ^ input[39] ^ input[38] ^ input[37] ^ input[36] ^ input[33] ^ input[32] ^ input[30] ^ input[26] ^ input[25] ^ input[21] ^ input[20] ^ input[18] ^ input[17] ^ input[16] ^ input[15] ^ input[14] ^ input[13] ^ input[10];
-	output[2] = input[43] ^ input[41] ^ input[40] ^ input[39] ^ input[36] ^ input[35] ^ input[34] ^ input[33] ^ input[32] ^ input[29] ^ input[27] ^ input[26] ^ input[25] ^ input[24] ^ input[22] ^ input[21] ^ input[20] ^ input[18] ^ input[13] ^ input[12] ^ input[9] ;
-	output[3] = input[42] ^ input[40] ^ input[39] ^ input[38] ^ input[35] ^ input[34] ^ input[33] ^ input[32] ^ input[31] ^ input[28] ^ input[26] ^ input[25] ^ input[24] ^ input[23] ^ input[21] ^ input[20] ^ input[19] ^ input[17] ^ input[12] ^ input[8];
-	output[4] = input[43] ^ input[41] ^ input[40] ^ input[32] ^ input[30] ^ input[26] ^ input[25] ^ input[24] ^ input[23] ^ input[21] ^ input[20] ^ input[17] ^ input[15] ^ input[14] ^ input[7];
-	output[5] = input[42] ^ input[40] ^ input[39] ^ input[31] ^ input[29] ^ input[25] ^ input[24] ^ input[23] ^ input[22] ^ input[20] ^ input[19] ^ input[16] ^ input[14] ^ input[13] ^ input[6];
-	output[6] = input[41] ^ input[39] ^ input[38] ^ input[30] ^ input[28] ^ input[24] ^ input[23] ^ input[22] ^ input[21] ^ input[19] ^ input[18] ^ input[15] ^ input[13] ^ input[12] ^ input[5];
-	output[7] = input[43] ^ input[39] ^ input[34] ^ input[33] ^ input[31] ^ input[29] ^ input[26] ^ input[23] ^ input[20] ^ input[19] ^ input[16] ^ input[15] ^ input[12] ^ input[4];
-	output[8] = input[43] ^ input[42] ^ input[40] ^ input[39] ^ input[37] ^ input[34] ^ input[32] ^ input[31] ^ input[30] ^ input[28] ^ input[27] ^ input[26] ^ input[25] ^ input[21] ^ input[17] ^ input[16] ^ input[3];
-	output[9] = input[43] ^ input[42] ^ input[41] ^ input[40] ^ input[37] ^ input[36] ^ input[34] ^ input[30] ^ input[29] ^ input[25] ^ input[24] ^ input[22] ^ input[21] ^ input[20] ^ input[19] ^ input[18] ^ input[17] ^ input[14] ^ input[2];
-	output[10] = input[42] ^ input[41] ^ input[40] ^ input[39] ^ input[36] ^ input[35] ^ input[33] ^ input[29] ^ input[28] ^ input[24] ^ input[23] ^ input[21] ^ input[20] ^ input[19] ^ input[18] ^ input[17] ^ input[16] ^ input[13] ^ input[1];
-	output[11] = input[41] ^ input[40] ^ input[39] ^ input[38] ^ input[35] ^ input[34] ^ input[32] ^ input[28] ^ input[27] ^ input[23] ^ input[22] ^ input[20] ^ input[19] ^ input[18] ^ input[17] ^ input[16] ^ input[15] ^ input[12] ^ input[0];
-}
-
-//  BCH(44, 32)生成矩阵 单位矩阵的
-vector<vector<int>> generateMatrix = {
-    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 1,0,1,0,1,0,0,1,1,1,0,0},
-    {0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,1,0,1,0,1,0,0,1,1,1,0},
-    {0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,1,0,1,0,1,0,0,1,1,1},
-    {0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 1,0,1,1,1,1,0,0,1,1,1,1},
-    {0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 1,1,1,1,0,1,1,1,1,0,1,1},
-    {0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 1,1,0,1,0,0,1,0,0,0,0,1},
-    {0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 1,1,0,0,0,0,0,0,1,1,0,0},
-    {0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,1,1,0,0,0,0,0,0,1,1,0},
-    {0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,1,1,0,0,0,0,0,0,1,1},
-    {0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 1,0,1,1,0,0,0,1,1,1,0,1},
-    {0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 1,1,1,1,0,0,0,1,0,0,1,0},
-    {0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,1,1,1,1,0,0,0,1,0,0,1},
-    {0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 1,0,0,1,0,1,0,1,1,0,0,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,1,0,0,1,0,1,0,1,1,0,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,1,0,0,1,0,1,0,1,1,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,1,0,0,1,0,1,0,1,1},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 1,0,1,0,0,0,0,0,1,0,0,1},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 1,1,1,1,1,0,0,1,1,0,0,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,1,1,1,1,1,0,0,1,1,0,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,1,1,1,1,1,0,0,1,1,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,1,1,1,1,1,0,0,1,1},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0, 1,0,1,0,0,1,1,0,0,1,0,1},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0, 1,1,1,1,1,0,1,0,1,1,1,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0, 0,1,1,1,1,1,0,1,0,1,1,1},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0, 1,0,0,1,0,1,1,1,0,1,1,1},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0, 1,1,1,0,0,0,1,0,0,1,1,1},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0, 1,1,0,1,1,0,0,0,1,1,1,1},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0, 1,1,0,0,0,1,0,1,1,0,1,1},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0, 1,1,0,0,1,0,1,1,0,0,0,1},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0, 1,1,0,0,1,1,0,0,0,1,0,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0, 0,1,1,0,0,1,1,0,0,0,1,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1, 0,0,1,1,0,0,1,1,0,0,0,1}
-};
-
-//  BCH(44, 32)伴随矩阵，其实就是新旧校验位的异或值
-const vector<vector<int>> adjointMatrix = {
-    {1,0,0,1,1,1,1,0,0,1,1,0,1,0,0,0,1,1,0,0,0,1,1,0,1,1,1,1,1,1,0,0, 1,0,0,0,0,0,0,0,0,0,0,0},
-    {0,1,0,0,1,1,1,1,0,0,1,1,0,1,0,0,0,1,1,0,0,0,1,1,0,1,1,1,1,1,1,0, 0,1,0,0,0,0,0,0,0,0,0,0},
-    {1,0,1,1,1,0,0,1,1,1,1,1,0,0,1,0,1,1,1,1,0,1,1,1,0,1,0,0,0,0,1,1, 0,0,1,0,0,0,0,0,0,0,0,0},
-    {0,1,0,1,1,1,0,0,1,1,1,1,1,0,0,1,0,1,1,1,1,0,1,1,1,0,1,0,0,0,0,1, 0,0,0,1,0,0,0,0,0,0,0,0},
-    {1,0,1,1,0,0,0,0,0,0,0,1,0,1,0,0,0,1,1,1,1,0,1,1,0,0,1,0,1,1,0,0, 0,0,0,0,1,0,0,0,0,0,0,0},
-    {0,1,0,1,1,0,0,0,0,0,0,0,1,0,1,0,0,0,1,1,1,1,0,1,1,0,0,1,0,1,1,0, 0,0,0,0,0,1,0,0,0,0,0,0},
-    {0,0,1,0,1,1,0,0,0,0,0,0,0,1,0,1,0,0,0,1,1,1,1,0,1,1,0,0,1,0,1,1, 0,0,0,0,0,0,1,0,0,0,0,0},
-    {1,0,0,0,1,0,0,0,0,1,1,0,1,0,1,0,0,1,0,0,1,0,0,1,1,0,0,1,1,0,0,1, 0,0,0,0,0,0,0,1,0,0,0,0},
-    {1,1,0,1,1,0,1,0,0,1,0,1,1,1,0,1,1,1,1,0,0,0,1,0,0,0,1,1,0,0,0,0, 0,0,0,0,0,0,0,0,1,0,0,0},
-    {1,1,1,1,0,0,1,1,0,1,0,0,0,1,1,0,0,0,1,1,0,1,1,1,1,1,1,0,0,1,0,0, 0,0,0,0,0,0,0,0,0,1,0,0},
-    {0,1,1,1,1,0,0,1,1,0,1,0,0,0,1,1,0,0,0,1,1,0,1,1,1,1,1,1,0,0,1,0, 0,0,0,0,0,0,0,0,0,0,1,0},
-    {0,0,1,1,1,1,0,0,1,1,0,1,0,0,0,1,1,0,0,0,1,1,0,1,1,1,1,1,1,0,0,1, 0,0,0,0,0,0,0,0,0,0,0,1}
-};
-
-
 
 /**
  BCH编码
@@ -127,25 +36,43 @@ const vector<vector<int>> adjointMatrix = {
  */
 void BCHCode::BCHEncode(bitset<dataLen> & input, bitset<codeLen> & output) {
     //printf("BCHEncode start...\n");
-//    for(int j = 0; j < codeLen; j++) {
-//        output[codeLen - 1 - j] = 0;
-//        for(int i = 0; i < dataLen; i++) {
-//            if(input[dataLen - 1 - i] * generateMatrix[i][j]) {
-//                output.flip(codeLen - 1 - j);
-//            }
-//        }
-//    }
-    fun_GenerateParity(input, output);
+
+    //进行赋值操作
+    for(int i = 0; i < dataLen; i++) {
+        output[i + 12] = input[i];
+    }
+//    output[11] = input[31] ^ input[28] ^ input[27] ^ input[26] ^ input[25] ^ input[22] ^ input[21] ^ input[19] ^ input[15] ^ input[14] ^ input[10] ^ input[9] ^ input[7] ^ input[6] ^ input[5] ^ input[4] ^ input[3] ^ input[2];
+//    output[10] = input[30] ^ input[27] ^ input[26] ^ input[25] ^ input[24] ^ input[21] ^ input[20] ^ input[18]  ^ input[14] ^ input[13] ^ input[9] ^ input[8] ^ input[6] ^ input[5] ^ input[4] ^ input[3] ^ input[2] ^ input[1];
+//    output[9] = input[31] ^ input[29] ^ input[28]  ^ input[27] ^ input[24] ^ input[23] ^ input[22] ^ input[21] ^ input[20] ^ input[17] ^ input[15] ^ input[14] ^ input[13]  ^ input[12] ^ input[10] ^ input[9] ^ input[8] ^ input[6]  ^ input[1] ^ input[0];
+//    output[8] = input[30] ^ input[28] ^ input[27] ^ input[26] ^ input[23] ^ input[22] ^ input[21] ^ input[20] ^ input[19] ^ input[16] ^ input[14] ^ input[13] ^ input[12] ^ input[11]  ^ input[9] ^ input[8] ^ input[7] ^ input[5] ^ input[0];
+//    output[7] = input[31] ^ input[29] ^ input[28] ^ input[20] ^ input[18] ^ input[14] ^ input[13] ^ input[12] ^ input[11] ^ input[9] ^ input[8] ^ input[5] ^ input[3] ^ input[2];
+//    output[6] = input[30] ^ input[28] ^ input[27] ^ input[19] ^ input[17] ^ input[13]^ input[12] ^ input[11] ^ input[10] ^ input[8] ^ input[7] ^ input[4] ^ input[2] ^ input[1];
+//    output[5] = input[29] ^ input[27] ^ input[26] ^ input[18] ^ input[16] ^ input[12] ^ input[11] ^ input[10] ^ input[9] ^ input[7] ^ input[6] ^ input[3] ^ input[1] ^ input[0];
+//    output[4] = input[31] ^ input[27]  ^ input[22] ^ input[21] ^ input[19] ^ input[17] ^ input[14] ^ input[11] ^ input[8] ^ input[7] ^ input[4] ^ input[3] ^ input[0];
+//    output[3] = input[31] ^ input[30] ^ input[28] ^ input[27] ^ input[25] ^ input[22] ^ input[20] ^ input[19] ^ input[18] ^ input[16] ^ input[15] ^ input[14] ^ input[13] ^ input[9] ^ input[5] ^ input[4];
+//    output[2] = input[31] ^ input[30] ^ input[29] ^ input[28] ^ input[25] ^ input[24] ^ input[22] ^ input[18] ^ input[17] ^ input[13] ^ input[12] ^ input[10] ^ input[9] ^ input[8] ^ input[7] ^ input[6] ^ input[5] ^ input[2];
+//    output[1] = input[30] ^ input[29] ^ input[28] ^ input[27] ^ input[24] ^ input[23] ^ input[21] ^ input[17] ^ input[16] ^ input[12] ^ input[11] ^ input[9] ^ input[8] ^ input[7] ^ input[6] ^ input[5] ^ input[4] ^ input[1];
+//    output[0] = input[29] ^ input[28] ^ input[27] ^ input[26] ^ input[23] ^ input[22] ^ input[20] ^ input[16] ^ input[15] ^ input[11] ^ input[10] ^ input[8] ^ input[7] ^ input[6] ^ input[5] ^ input[4] ^ input[3] ^ input[0];
+
+    output[0] = input[0] ^ input[3] ^ input[4] ^ input[5] ^ input[6] ^ input[9] ^ input[10] ^ input[12] ^ input[16] ^ input[17] ^ input[21] ^ input[22] ^ input[24] ^ input[25] ^ input[26] ^ input[27] ^ input[28] ^ input[29];                                //p0
+    output[1] = input[1] ^ input[4] ^ input[5] ^ input[6] ^ input[7] ^ input[10] ^ input[11] ^ input[13] ^ input[17] ^ input[18] ^ input[22] ^ input[23] ^ input[25] ^ input[26] ^ input[27] ^ input[28] ^ input[29] ^ input[30];                               //p1
+    output[2] = input[0] ^ input[2] ^ input[3] ^ input[4] ^ input[7] ^ input[8] ^ input[9] ^ input[10] ^ input[11] ^ input[14] ^ input[16] ^ input[17] ^ input[18] ^ input[19] ^ input[21] ^ input[22] ^ input[23] ^ input[25] ^ input[30] ^ input[31];         //p2
+    output[3] = input[1] ^ input[3] ^ input[4] ^ input[5] ^ input[8] ^ input[9] ^ input[10] ^ input[11] ^ input[12] ^ input[15] ^ input[17] ^ input[18] ^ input[19] ^ input[20] ^ input[22] ^ input[23] ^ input[24] ^ input[26] ^ input[31];                    //p3
+    output[4] = input[0] ^ input[2] ^ input[3] ^ input[11] ^ input[13] ^ input[17] ^ input[18] ^ input[19] ^ input[20] ^ input[22] ^ input[23] ^ input[26] ^ input[28] ^ input[29];                                                                             //p4
+    output[5] = input[1] ^ input[3] ^ input[4] ^ input[12] ^ input[14] ^ input[18] ^ input[19] ^ input[20] ^ input[21] ^ input[23] ^ input[24] ^ input[27] ^ input[29] ^ input[30];                                                                             //p5
+    output[6] = input[2] ^ input[4] ^ input[5] ^ input[13] ^ input[15] ^ input[19] ^ input[20] ^ input[21] ^ input[22] ^ input[24] ^ input[25] ^ input[28] ^ input[30] ^ input[31];                                                                             //p6
+    output[7] = input[0] ^ input[4] ^ input[9] ^ input[10] ^ input[12] ^ input[14] ^ input[17] ^ input[20] ^ input[23] ^ input[24] ^ input[27] ^ input[28] ^ input[31];                                                                                         //p7
+    output[8] = input[0] ^ input[1] ^ input[3] ^ input[4] ^ input[6] ^ input[9] ^ input[11] ^ input[12] ^ input[13] ^ input[15] ^ input[16] ^ input[17] ^ input[18] ^ input[22] ^ input[26] ^ input[27];                                                        //p8
+    output[9] = input[0] ^ input[1] ^ input[2] ^ input[3] ^ input[6] ^ input[7] ^ input[9] ^ input[13] ^ input[14] ^ input[18] ^ input[19] ^ input[21] ^ input[22] ^ input[23] ^ input[24] ^ input[25] ^ input[26] ^ input[29];                                 //p9
+    output[10] = input[1] ^ input[2] ^ input[3] ^ input[4] ^ input[7] ^ input[8] ^ input[10] ^ input[14] ^ input[15] ^ input[19] ^ input[20] ^ input[22] ^ input[23] ^ input[24] ^ input[25] ^ input[26] ^ input[27] ^ input[30];                               //p10
+    output[11] = input[2] ^ input[3] ^ input[4] ^ input[5] ^ input[8] ^ input[9] ^ input[11] ^ input[15] ^ input[16] ^ input[20] ^ input[21] ^ input[23] ^ input[24] ^ input[25] ^ input[26] ^ input[27] ^ input[28] ^ input[31];                               //p11
+
     //printf("BCHEncode end...\n");
 }
 
 
 void BCHCode::BCHDecode(bitset<codeLen> & input, bitset<codeLen> & output) {
-    //getParityXOR(input, parityXOR);
-    fun_Adjoint(input, parityXOR);
-//    cout << "\tThe result of parityXOR is " << parityXOR << endl;
-//    fun_Adjoint(input, parityXOR);
-//    cout << "\tThe result of Adjoint is : " << parityXOR << endl;
+    getParityXOR(input, parityXOR);
     //如果没有错误
     if (!parityXOR.any()) {
         output = input;
@@ -166,22 +93,33 @@ void BCHCode::BCHDecode(bitset<codeLen> & input, bitset<codeLen> & output) {
  求错误伴随式
 
  @param input 接收到的数据
- @param output 错误伴随式
+ @param output 错误伴随式 生成的十二位校验子
  */
 void BCHCode::getParityXOR(bitset<codeLen> & input, bitset<parityLen> & output) {
-    //printf("getParityXOR start...\n");
-//    for(int i  = 0; i < parityLen; i++) {
-//        output[i] = 0;
-//        for(int j = 0; j < codeLen; j++) {
-//            if(input[codeLen - 1  - j] * adjointMatrix[i][j]) {
-//                output.flip(i);
-//            }
-//        }
-//    }
-
-
-    //cout << "\tgenerate 7 parithy number is:\t" << output << endl;
-    //printf("getParityXOR end...\n");
+//    output[0] = input[43] ^ input[40] ^ input[39] ^ input[38] ^ input[37] ^ input[34] ^ input[33] ^ input[31] ^ input[27] ^ input[26] ^ input[22] ^ input[21] ^ input[19] ^ input[18] ^ input[17] ^ input[16] ^input[15] ^ input[14] ^ input[11];
+//    output[1] = input[42] ^ input[39] ^ input[38] ^ input[37] ^ input[36] ^ input[33] ^ input[32] ^ input[30] ^ input[26] ^ input[25] ^ input[21] ^ input[20] ^ input[18] ^ input[17] ^ input[16] ^ input[15] ^ input[14] ^ input[13] ^ input[10];
+//    output[2] = input[43] ^ input[41] ^ input[40] ^ input[39] ^ input[36] ^ input[35] ^ input[34] ^ input[33] ^ input[32] ^ input[29] ^ input[27] ^ input[26] ^ input[25] ^ input[24] ^ input[22] ^ input[21] ^ input[20] ^ input[18] ^ input[13] ^ input[12] ^ input[9] ;
+//    output[3] = input[42] ^ input[40] ^ input[39] ^ input[38] ^ input[35] ^ input[34] ^ input[33] ^ input[32] ^ input[31] ^ input[28] ^ input[26] ^ input[25] ^ input[24] ^ input[23] ^ input[21] ^ input[20] ^ input[19] ^ input[17] ^ input[12] ^ input[8];
+//    output[4] = input[43] ^ input[41] ^ input[40] ^ input[32] ^ input[30] ^ input[26] ^ input[25] ^ input[24] ^ input[23] ^ input[21] ^ input[20] ^ input[17] ^ input[15] ^ input[14] ^ input[7];
+//    output[5] = input[42] ^ input[40] ^ input[39] ^ input[31] ^ input[29] ^ input[25] ^ input[24] ^ input[23] ^ input[22] ^ input[20] ^ input[19] ^ input[16] ^ input[14] ^ input[13] ^ input[6];
+//    output[6] = input[41] ^ input[39] ^ input[38] ^ input[30] ^ input[28] ^ input[24] ^ input[23] ^ input[22] ^ input[21] ^ input[19] ^ input[18] ^ input[15] ^ input[13] ^ input[12] ^ input[5];
+//    output[7] = input[43] ^ input[39] ^ input[34] ^ input[33] ^ input[31] ^ input[29] ^ input[26] ^ input[23] ^ input[20] ^ input[19] ^ input[16] ^ input[15] ^ input[12] ^ input[4];
+//    output[8] = input[43] ^ input[42] ^ input[40] ^ input[39] ^ input[37] ^ input[34] ^ input[32] ^ input[31] ^ input[30] ^ input[28] ^ input[27] ^ input[26] ^ input[25] ^ input[21] ^ input[17] ^ input[16] ^ input[3];
+//    output[9] = input[43] ^ input[42] ^ input[41] ^ input[40] ^ input[37] ^ input[36] ^ input[34] ^ input[30] ^ input[29] ^ input[25] ^ input[24] ^ input[22] ^ input[21] ^ input[20] ^ input[19] ^ input[18] ^ input[17] ^ input[14] ^ input[2];
+//    output[10] = input[42] ^ input[41] ^ input[40] ^ input[39] ^ input[36] ^ input[35] ^ input[33] ^ input[29] ^ input[28] ^ input[24] ^ input[23] ^ input[21] ^ input[20] ^ input[19] ^ input[18] ^ input[17] ^ input[16] ^ input[13] ^ input[1];
+//    output[11] = input[41] ^ input[40] ^ input[39] ^ input[38] ^ input[35] ^ input[34] ^ input[32] ^ input[28] ^ input[27] ^ input[23] ^ input[22] ^ input[20] ^ input[19] ^ input[18] ^ input[17] ^ input[16] ^ input[15] ^ input[12] ^ input[0];
+   output[0] = input[0] ^ input[12] ^ input[15] ^ input[16] ^ input[17] ^ input[18] ^ input[21] ^ input[22] ^ input[24] ^ input[28] ^ input[29] ^ input[33] ^ input[34] ^ input[36] ^ input[37] ^ input[38] ^ input[39] ^ input[40] ^ input[41];                           //a0
+   output[1] = input[1] ^ input[13] ^ input[16] ^ input[17] ^ input[18] ^ input[19] ^ input[22] ^ input[23] ^ input[25] ^ input[29] ^ input[30] ^ input[34] ^ input[35] ^ input[37] ^ input[38] ^ input[39] ^ input[40] ^ input[41] ^ input[42];                           //a1
+   output[2] = input[2] ^ input[12] ^ input[14] ^ input[15] ^ input[16] ^ input[19] ^ input[20] ^ input[21] ^ input[22] ^ input[23] ^ input[26] ^ input[28] ^ input[29] ^ input[30] ^ input[31] ^ input[33] ^ input[34] ^ input[35] ^ input[37] ^ input[42] ^ input[43];   //a2
+   output[3] = input[3] ^ input[13] ^ input[15] ^ input[16] ^ input[17] ^ input[20] ^ input[21] ^ input[22] ^ input[23] ^ input[24] ^ input[27] ^ input[29] ^ input[30] ^ input[31] ^ input[32] ^ input[34] ^ input[35] ^ input[36] ^ input[38] ^ input[43];               //a3
+   output[4] = input[4] ^ input[12] ^ input[14] ^ input[15] ^ input[23] ^ input[25] ^ input[29] ^ input[30] ^ input[31] ^ input[32] ^ input[34] ^ input[35] ^ input[38] ^ input[40] ^ input[41];                                                                           //a4
+   output[5] = input[5] ^ input[13] ^ input[15] ^ input[16] ^ input[24] ^ input[26] ^ input[30] ^ input[31] ^ input[32] ^ input[33] ^ input[35] ^ input[36] ^ input[39] ^ input[41] ^ input[42];                                                                           //a5
+   output[6] = input[6] ^ input[14] ^ input[16] ^ input[17] ^ input[25] ^ input[27] ^ input[31] ^ input[32] ^ input[33] ^ input[34] ^ input[36] ^ input[37] ^ input[40] ^ input[42] ^ input[43];                                                                           //a6
+   output[7] = input[7] ^ input[12] ^ input[16] ^ input[21] ^ input[22] ^ input[24] ^ input[26] ^ input[29] ^ input[32] ^ input[35] ^ input[36] ^ input[39] ^ input[40] ^ input[43];                                                                                       //a7
+   output[8] = input[8] ^ input[12] ^ input[13] ^ input[15] ^ input[16] ^ input[18] ^ input[21] ^ input[23] ^ input[24] ^ input[25] ^ input[27] ^ input[28] ^ input[29] ^ input[30] ^ input[34] ^ input[38] ^ input[39];                                                   //a8
+   output[9] = input[9] ^ input[12] ^ input[13] ^ input[14] ^ input[15] ^ input[18] ^ input[19] ^ input[21] ^ input[25] ^ input[26] ^ input[30] ^ input[31] ^ input[33] ^ input[34] ^ input[35] ^ input[36] ^ input[37] ^ input[38] ^ input[41];                           //a9
+   output[10] = input[10] ^ input[13] ^ input[14] ^ input[15] ^ input[16] ^ input[19] ^ input[20] ^ input[22] ^ input[26] ^ input[27] ^ input[31] ^ input[32] ^ input[34] ^ input[35] ^ input[36] ^ input[37] ^ input[38] ^ input[39] ^ input[42];                         //a10
+   output[11] = input[11] ^ input[14] ^ input[15] ^ input[16] ^ input[17] ^ input[20] ^ input[21] ^ input[23] ^ input[27] ^ input[28] ^ input[32] ^ input[33] ^ input[35] ^ input[36] ^ input[37] ^ input[38] ^ input[39] ^ input[40] ^ input[43];                         //a11
 }
 
 
@@ -205,8 +143,7 @@ void BCHCode::setTable() {
         deInput = enOutput;
         deInput.flip(errLoc);             //翻转第errLoc位
 
-        //getParityXOR(deInput, parityXOR);
-        fun_Adjoint(deInput, parityXOR);
+        getParityXOR(deInput, parityXOR);
 
         bitset<codeLen> tmp;
         tmp.flip(errLoc);
@@ -222,8 +159,7 @@ void BCHCode::setTable() {
             deInput.flip(errLoc1);            //翻转第errLoc1位
             deInput.flip(errLoc2);            //翻转第errLoc2位
 
-            //getParityXOR(deInput, parityXOR);
-            fun_Adjoint(deInput, parityXOR);
+            getParityXOR(deInput, parityXOR);
 
             bitset<codeLen> tmp;
             tmp.flip(errLoc1);
@@ -269,54 +205,45 @@ void BCHCode::ErrorCorrection() {
         }
     }
 
-
     for(int i = 0; i < testSecDeOutput.size(); i++) {
         if(testSecDeOutput[i] == testSecOutput[i] && !flag[i]) {
             cout << "\tUsing the inner BCHEncode_" << i <<" success and the sequence after repair is: \t" << testSecDeOutput[i] <<endl;
             testSecDeInput[i] = testSecOutput[i];
         } else if(testSecDeOutput[i] != testSecOutput[i]) {
+            testSecDeOutput[i].reset();
             //如果只有1个序列其中的2位以上发生了错误，则抛给异或进行解码
             cout << "\tThe sequence_"<< i << " " << testSecDeOutput[i] << " have more than 2 errors, enter the second level of redundancy check:\t" << endl;
             BCHDecode(testXORDeInput, testXORDeOutput); //对XOR进行解码
             if(testXORDeOutput == testXOR) { //证明XOR无错误
+                cout <<"\tThe XOR:\t"<< testXORDeOutput << " has no errors" << endl;
                 //做异或校验
-                for (int j = 0; j < blocksize; j ++) {
-                    int temp = 0;
-                    for(int k = 0; k < testSecDeOutput.size(); k++) {
-                        //cout << "\ttestSecOutput:\t" << testSecOutput[k] << endl;
-                        if(k != i && testSecDeOutput[k][j]) {
-                            temp++;
-                            //cout << "\tk:\t" << j << "\tj:\t" << j << testSecDeOutput[k][j] << endl;
-                        } else {
-                            continue;
+                for(int k = 0; k < testSecDeOutput.size(); k++) {
+                    if(k != i) {
+                        for (int j = 0; j < blocksize; j ++) {
+                            testSecDeOutput[i][j] =  testSecDeOutput[i][j]  ^ testSecDeOutput[k][j];
                         }
-                    }
-                    if(testXOR[j]) {
-                        temp++;
-                    }
-                    if(temp % 2 != 0) {
-                        testSecDeOutput[i][j] = 1;
                     } else {
-                        testSecDeOutput[i][j] = 0;
+                        continue;
                     }
+                }
+                for (int j = 0; j < blocksize; j ++) {
+                    testSecDeOutput[i][j] = testSecDeOutput[i][j] ^ testXOR[j];
                 }
                 if(testSecDeOutput[i] == testSecOutput[i]) {
                     cout << "\tUsing the outer XOREncode_"<< i <<" success and the sequence after repair is:\t" << testSecDeOutput[i] <<endl;
                     testSecDeInput[i] = testSecDeOutput[i]; //要记得这个条纹修复后，测试的时候，记得把DeInput给替换过来，不然会出现问题
                 } else {
-                    //cout << "\t" << testSecDeOutput[i] << endl;
+                    //cout << "\ttestSecDeOutput is : " << testSecDeOutput[i] << endl;
                     cout << "\tThere are more than two errors occurred in more than two sequences, repair failed.\t" << endl;
                 }
             }
             else {
                 cout << "\tThe XOR have more than 3 errors, repair failed:\t " << testXORDeOutput << endl;
             }
-
         }
-
     }
-
 }
+
 
 /**
 * 测试1位错误 所用时间
@@ -368,7 +295,7 @@ void BCHCode::testTwoErrors() {
                 Time_consuming_Read += 1000000 * (end_time.tv_sec-start_time.tv_sec)+ end_time.tv_usec-start_time.tv_usec;
             }
         }
-    }  //146.934s 159.525s      0.31s 0.32s 0.32s
+    }
     cout << "\tFunction of gengerate two errors and decode them execution time is " << (double)Time_consuming_Read  / 1000000 << " s" << endl;
 }
 
@@ -420,13 +347,10 @@ void BCHCode::testRead() {
     for(int i = 0; i < stripesize; i++) {
         int m = 0, n = 3;
         int temp = rand()%(n - m + 1) + m; //生成[m, n]之间的随机数 temp为testSecDeInput错误的个数
-        //cout << "\terrLoc at";
         for(int j = 0; j < temp; j++) {
             int errLoc = rand()%(43 - 0 + 1) + 0; //随机生成[0,43]的错误位置
             testSecDeInput[i].flip(errLoc); //产生错误的时候，暂时测的是，如果是3个错误 0 1 2错误 如果是2个错误 0 1出错
-            //cout << errLoc << "," ;
         }
-        //cout << endl;
         cout << "\tThe sequence_" << i << " after insert "<< temp <<" error(s) " << " is:\t"  << testSecDeInput[i] << endl;
     }
 
@@ -465,11 +389,9 @@ void BCHCode::testWrite() {
         }
         //cout << "\tBCH_"<< j << " encoding before:\t";
         //cout << testSecInput[j] << endl;
-        //BCHEncode(testSecInput[j], testSecOutput[j]);
-        //cout << "\tBCH_"<< j << " encoding after:\t";
-        //cout << testSecOutput[j] << endl;
-        fun_GenerateParity(testSecInput[j], testSecOutput[j]);
-        cout << "\tfunGenerateParity after:" << testSecOutput[j] << endl;
+        BCHEncode(testSecInput[j], testSecOutput[j]);
+        cout << "\tBCH_"<< j << " encoding after:\t";
+        cout << testSecOutput[j] << endl;
         //每生成一个编码条纹，做一次校验
         for (int i = 0; i < blocksize; i ++) {
             if(testSecOutput[j][i]) {

@@ -1,18 +1,20 @@
 #include <iostream>
 #include "BCHCode.h"
+#include <sys/time.h>
 using namespace std;
 
 
 unsigned long Total_time = 0;
 int main()
 {
-    clock_t start, finish;
-    start = clock();
+    struct  timeval  start_time;
+    struct  timeval  end_time;
+    gettimeofday(&start_time, NULL);
     BCHCode *bchCode = new BCHCode();
     bchCode -> testBCH();
-    finish = clock();
-    Total_time =  (double)(finish - start) / CLOCKS_PER_SEC;
-    cout << "\tTotal operation Time is " << Total_time << " s" << endl;
+    gettimeofday(&end_time, NULL);
+    Total_time += 1000000 * (end_time.tv_sec-start_time.tv_sec)+ end_time.tv_usec-start_time.tv_usec;
+    cout << "\tTotal operation Time is " << (double)Total_time  / 1000000 << " s" << endl;
     //bchCode -> errTest();
     return 0;
 }
