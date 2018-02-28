@@ -183,7 +183,7 @@ void BCHCode::ErrorCorrection() {
             //cout << "\tThe sequence_"<< i << " " << testSecDeOutput[i] << " have more than 2 errors, enter the second level of redundancy check:\t" << endl;
             testSecDeOutput[i].reset(); //把原来的值清0，进入第二级校验
             //cout << "\tThe first number of group is: i / 4 * 4 = " << i / 4 * 4 << endl;
-            int Group = i >> 2 ; //i右移了两位，除以4，看具体在哪一组，第二级的校验要用到
+            int Group = i / stripesize; //i右移了两位，除以4，看具体在哪一组，第二级的校验要用到
             BCHDecode(testXORDeInput[Group], testXORDeOutput[Group]); //对对应组的XOR进行解码
             if(testXORDeOutput[Group] == testXOR[Group]) { //证明本组的XOR无错误
                 //cout <<"\tThe XOR:\t"<< testXORDeOutput[Group] << " has no errors" << endl;
@@ -362,7 +362,7 @@ void BCHCode::testWrite() {
         //cout << "\tBCH_"<< j << " encoding after:\t";
         //cout << testSecOutput[j] << endl;
         //每生成一个编码条纹，做一次校验
-        int Group = j / 4;
+        int Group = j / stripesize;
         for (int i = 0; i < blocksize; i ++) {
             if(testSecOutput[j][i]) {
                 testXOR[Group].flip(i);
