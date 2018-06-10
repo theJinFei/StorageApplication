@@ -24,11 +24,12 @@
 
 #endif// _WIN32
 
+#ifdef _WIN32
 extern int gettimeofday(struct timeval *tp, void *tzp);
+#endif
 extern long timeDiffMacroSeconds(timeval& start, timeval& end);
 extern char* timeFormatMacroToString(long cost);
-void readData(char **buffer);
-
+extern void readData(char **buffer);
 #endif
 
 

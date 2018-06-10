@@ -8,7 +8,7 @@
 class BCHCode : public BasicClass {
 public:
 	BCHCode() { std::cout << "the BCHCode Constructor is called" << std::endl; }
-	BCHCode(char ** buffer, int CodeLen, int DataLen, int ParityLen, int UnitSize, int StripeNum, int Group) : BasicClass(buffer, CodeLen, DataLen, ParityLen, UnitSize, Group) {}
+	BCHCode(char ** buffer, int CodeLen, int DataLen, int ParityLen, int UnitSize, int StripeNum, int Group ) : BasicClass(buffer, CodeLen, DataLen, ParityLen, UnitSize, StripeNum, Group) {} 
 	bool getTable();
 	void getParity(std::bitset<44>& input, std::bitset<12>& output);
 	void Encode();			//一次写一组数据
@@ -18,6 +18,12 @@ public:
 	bool Check_Is_Right(char *before, char *after, int size);
 	void testCode();
 	~BCHCode() {}
+public:
+	static short Array_Table[4096];
+	static char  **before;
+	static std::vector<std::vector<int> > adjointMatrix;
+	static std::vector<std::vector<int> > Generate_Matrix;
+	static std::vector<std::vector<int> > Adjoint_Matrix;
 };
 
 #endif

@@ -1,4 +1,2 @@
-enter the two-level decode
-the two-level repair success
-write time cost 4.000 ms, 4000 us
-read time cost 4.000 ms, 4000 us
+write time cost 1.187 s, 1187160 us
+read time cost 2.517 s, 2517488 us

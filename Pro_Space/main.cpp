@@ -1,10 +1,16 @@
 #include "BasicClass.h"
 #include "main.h"
 #include "BCHCode_XOR.h"
+#include "BCHCode.h"
+#include "Hamming_XOR.h"
 
 #include <iostream>
 #include <fstream>
 #include <time.h>
+#include <string.h>
+
+#include <malloc.h>
+#include <stdio.h>
 
 using namespace std;
 
@@ -36,9 +42,9 @@ const char * filename = "TextFile1.txt";													//Linux文件地址
 
 #endif// _WIN32
 
-#define  UnitSize 8 													//字节 每个元素的字节数
+#define  UnitSize 512													//字节 每个元素的字节数
 #define  CodeLen 44 													//编码的长度
-#define  ParityLen 12 													//校验位的个数
+#define  ParityLen 12													//校验位的个数
 #define  DataLen 32 													//数据的长度
 #define	 StripeNum 5 													//条纹的个数
 #define  Group 1024 * 1024 * 1024 / DataLen / StripeNum / UnitSize		//总共需要做的实验次数
@@ -48,7 +54,7 @@ const char * filename = "TextFile1.txt";													//Linux文件地址
 extern int gettimeofday(struct timeval *tp, void *tzp);
 #endif
 #ifdef _WIN32
-extern int gettimeofday(struct timeval *tp, void *tzp)			//Win32重新定义计时的函数，精度为us
+int gettimeofday(struct timeval *tp, void *tzp)			//Win32重新定义计时的函数，精度为us
 {
 	time_t clock;
 	struct tm tm;
@@ -114,18 +120,22 @@ extern long timeDiffMacroSeconds(timeval& start, timeval& end) {
 
 void readData(char **buffer)
 {
-	for (int i = 0; i < StripeNum + 1; i++) {					//进行初始化的一些操作
+	/*for (int i = 0; i < StripeNum + 1; i++) {					//进行初始化的一些操作
 		buffer[i] = new char[CodeLen * UnitSize];
+		memset(buffer[i], 0, sizeof(char) * CodeLen * UnitSize);
+	}*/
+	for(int i = 0; i < StripeNum + 1; i++){
+		buffer[i] = (char *)_aligned_malloc(CodeLen * UnitSize, 32);	
 		memset(buffer[i], 0, sizeof(char) * CodeLen * UnitSize);
 	}
 
 	ifstream fin(filename);
 
-	if (fin.is_open) {
+	if (fin.is_open()) {
 		for (int i = 0; i < StripeNum; i++) {
 			fin.read(buffer[i], DataLen * UnitSize);				// 进行赋值，一次写1个块（即StripeNum * UnitSize * DataLen）
 		}
-		cout << "read data successfully !" << endl;
+		//cout << "read data successfully !" << endl;
 	}
 	else {
 		cout << "read data failed!" << endl;
@@ -134,13 +144,29 @@ void readData(char **buffer)
 }
 int main()
 {
-	char ** buffer = new char*[StripeNum + 1];									//一个二维指针，指向6*44块信息的地址，其中5 * 44为相应的信息单元
+	freopen("data.out", "w", stdout);											//将输出信息写入文件里
 
+	//char ** buffer = new char*[StripeNum + 1];									//一个二维指针，指向6*44块信息的地址，其中5 * 44为相应的信息单元
+	char **buffer = (char **)malloc((StripeNum + 1) * sizeof(char *));
 	readData(buffer);
 
 	BCHCode_XOR *bchCode_XOR = new BCHCode_XOR(buffer, CodeLen, DataLen, ParityLen, UnitSize, StripeNum, Group);
 
 	bchCode_XOR->testCode();
+
+	//char ** buffer2 = new char*[StripeNum];									//一个二维指针，指向6*44块信息的地址，其中5 * 44为相应的信息单元
+
+	//readData(buffer2);
+
+	//BCHCode *bchCode= new BCHCode(buffer2, CodeLen, DataLen, ParityLen, UnitSize, StripeNum, Group);
+
+	//bchCode->testCode();
+
+	//readData(buffer3);
+
+	//Hamming_XOR *hamming_XOR = new Hamming_XOR(buffer, CodeLen, DataLen, ParityLen, UnitSize, StripeNum, Group);
+
+	//hamming_XOR->testCode();
 
 	return 0;
 
